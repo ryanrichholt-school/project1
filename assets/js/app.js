@@ -1,9 +1,33 @@
 // Code for brewery ranking website
 
-function getBreweries(params=null){
+function getBreweries(params){
+    // Logs info to console
     var apiKey = "70ec47e3e10b786dfce3d08410c16454";
     var URL = "https://api.brewerydb.com/v2/breweries/";
 
+    par = {
+        key: apiKey,
+        format: 'json',
+    };
+
+    $.extend(true, par, params)
+
+    $.ajax({
+        url: URL,
+        method: "GET",
+        data: $.param(par)
+    }).done(function(response) {
+        console.log(response)
+        console.log(response.data)
+    });
+}
+
+
+function getBreweriesLocations(params){
+    // Logs info to console
+    var apiKey = "70ec47e3e10b786dfce3d08410c16454";
+    var URL = "https://api.brewerydb.com/v2/locations/";
+    
     par = {
         key: apiKey,
         format: 'json',
