@@ -48,12 +48,20 @@ function get_breweries_ranked(n=10){
 
 
 // Still needed
-
-function get_yelp_price(brewery_name){
-
+function get_yelp_info(brewery_name){
+    // gets all the data we need from yelp
 }
 
-function get_brewery_logo(brewery_name){
 
+function get_brewerydb_info(brewery_name){
+    // gets all the data we need from brewerydb
 }
+
+
+function build_brewery_button(brewery_obj){
+    // given a brewery object, like the example in get_beweries_ranked(), 
+    // return a new html element including the expandable div and all the info
+    // from the brewery_obj
+}
+
 
