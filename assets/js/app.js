@@ -1,48 +1,59 @@
-function getResults(term){    
-    var url = "https://api.giphy.com/v1/gifs/search"
+// Code for brewery ranking website
 
-    var search_params = {
-        api_key: "4b47391ae84f4d4ba766ea48f24cbcd6",
-        q: term
-    }
-
-    var req = $.ajax({
-      method: "GET",
-      url: url,
-      data: $.param(search_params)
-    })
-
-    req.done(function(resp){
-        console.log(resp.data)
-    })
-}
-
-function getBreweries(){
+function getBreweries(params=null){
     var apiKey = "70ec47e3e10b786dfce3d08410c16454";
     var URL = "https://api.brewerydb.com/v2/breweries/";
 
-    params = {
+    par = {
         key: apiKey,
         format: 'json',
     };
 
-    $.ajax({
-        url: URL,
-        method: "GET",
-        data: $.param(params)
-    }).done(function(response) {
-        console.log(response)
-    });
-}
-
-function getBreweries2(){
-    var apiKey = "70ec47e3e10b786dfce3d08410c16454";
-    var URL = "https://api.brewerydb.com/v2/breweries/?key=70ec47e3e10b786dfce3d08410c16454&format=json";
+    $.extend(true, par, params)
 
     $.ajax({
         url: URL,
         method: "GET",
+        data: $.param(par)
     }).done(function(response) {
         console.log(response)
+        console.log(response.data)
     });
 }
+
+
+function get_breweries_ranked(n=10){
+    // Ryan finishes this function
+    var breweries = [
+        {
+            name: 'ohso',
+           // logo_url: http://url.for.logo
+           // location: Arcadia, AZ
+           // price: $$
+           // beers: [Orange Blossom, Stawberry Blonde]
+           // phone number: 480-123-4567
+        },
+        {
+            name: 'fourpeaks',
+        },
+        {
+            name: 'helton',
+        },
+        {
+            name: 'motherbunch'
+        }
+    ]
+    return breweries
+}
+
+
+// Still needed
+
+function get_yelp_price(brewery_name){
+
+}
+
+function get_brewery_logo(brewery_name){
+
+}
+
