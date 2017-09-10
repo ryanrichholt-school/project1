@@ -14,13 +14,23 @@ firebase.initializeApp(config);
 
 var database = firebase.database()
 
-database.ref().once("value").then(function(snapshot){
+
+database.ref().on("value", function(snapshot){
+    var breweries = []
     var data = snapshot.val()
-    console.log(data)
     for(i in data){
-        build_brewery_button(data[i])
+        breweries.push(data[i])
+    }
+
+    var sorted = breweries.sort(function(a, b){
+        return a.votes - b.votes
+    })
+
+    for(i in sorted){
+        build_brewery_button(sorted[i])
     }
 })
+
 
 // For updating database
 function scan_cities(){
@@ -56,20 +66,21 @@ function findBreweriesInCity(city){
 }
 
 function upvote_brewery(breweryId){
-    var voted = localStorage.getItem('voted');
+    // Prevent a user from voting multiple times
+    var voted = sessionStorage.getItem('voted');
     if(!voted){
-        localStorage.setItem('voted', true)
+        sessionStorage.setItem('voted', true)
         var databaseRef = database.ref(breweryId).child('votes')
-        console.log(databaseRef)
         databaseRef.transaction(function(votes) {
             if (votes) {
                 votes = votes + 1;
             } else {
                 votes = 1
             }
-
             return votes;
         });
+    } else {
+        console.log('already voted')
     }
 }
 
