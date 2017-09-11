@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 $(document).ready(function() {
 
     // Initialize Firebase
@@ -9,58 +8,6 @@ $(document).ready(function() {
         projectId: "aaron-project-c8c21",
         storageBucket: "aaron-project-c8c21.appspot.com",
         messagingSenderId: "272640189163"
-=======
-// Code for brewery ranking website
-
-// Initialize Firebase
-var config = {
-    apiKey: "AIzaSyBtqVuU6Qtl_OtteNN2VYcS32PkzvT3VRo",
-    authDomain: "myawesomeproject-131ac.firebaseapp.com",
-    databaseURL: "https://myawesomeproject-131ac.firebaseio.com",
-    projectId: "myawesomeproject-131ac",
-    storageBucket: "myawesomeproject-131ac.appspot.com",
-    messagingSenderId: "369533829285"
-};
-
-firebase.initializeApp(config);
-
-var database = firebase.database()
-
-
-database.ref().on("value", function(snapshot){
-    var breweries = []
-    var data = snapshot.val()
-    for(i in data){
-        breweries.push(data[i])
-    }
-
-    var sorted = breweries.sort(function(a, b){
-        return a.votes - b.votes
-    })
-
-    for(i in sorted){
-        build_brewery_button(sorted[i])
-    }
-})
-
-
-// For updating database
-function scan_cities(){
-    var cities = ['Tempe', 'Scottsdale', 'Phoenix', 'Mesa']
-    for(i in cities){
-        findBreweriesInCity(cities[i])
-    }
-}
-
-function findBreweriesInCity(city){
-    var apiKey = "70ec47e3e10b786dfce3d08410c16454";
-    var URL = "https://api.brewerydb.com/v2/locations/";
-    
-    par = {
-        key: apiKey,
-        format: 'json',
-        locality: city,
->>>>>>> cd19e4312e137373bce1fe5069339e36910f630a
     };
 
     firebase.initializeApp(config);
@@ -75,7 +22,6 @@ function findBreweriesInCity(city){
         for(i = 0; i < data.length; i++) {
             breweries.push(data[i]);
         }
-<<<<<<< HEAD
 
         var sorted = breweries.sort(function(a, b){
             return a.votes - b.votes
@@ -134,27 +80,7 @@ function findBreweriesInCity(city){
                 var db_obj = database.ref().child(brewery.id);
                 db_obj.update(brewery);
             }
-=======
-    });
-}
-
-function upvote_brewery(breweryId){
-    // Prevent a user from voting multiple times
-    var voted = sessionStorage.getItem('voted');
-    if(!voted){
-        sessionStorage.setItem('voted', true)
-        var databaseRef = database.ref(breweryId).child('votes')
-        databaseRef.transaction(function(votes) {
-            if (votes) {
-                votes = votes + 1;
-            } else {
-                votes = 1
-            }
-            return votes;
->>>>>>> cd19e4312e137373bce1fe5069339e36910f630a
         });
-    } else {
-        console.log('already voted')
     }
 
     // function upvoteBrewery(breweryId){
