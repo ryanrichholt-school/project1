@@ -1,148 +1,194 @@
-// Code for brewery ranking website
+$(document).ready(function() {
 
-// Initialize Firebase
-var config = {
-    apiKey: "AIzaSyBtqVuU6Qtl_OtteNN2VYcS32PkzvT3VRo",
-    authDomain: "myawesomeproject-131ac.firebaseapp.com",
-    databaseURL: "https://myawesomeproject-131ac.firebaseio.com",
-    projectId: "myawesomeproject-131ac",
-    storageBucket: "myawesomeproject-131ac.appspot.com",
-    messagingSenderId: "369533829285"
-};
-
-firebase.initializeApp(config);
-
-var database = firebase.database()
-
-database.ref().once("value").then(function(snapshot){
-    var data = snapshot.val()
-    console.log(data)
-    for(i in data){
-        build_brewery_button(data[i])
-    }
-})
-
-// For updating database
-function scan_cities(){
-    var cities = ['Tempe', 'Scottsdale', 'Phoenix', 'Mesa']
-    for(i in cities){
-        findBreweriesInCity(cities[i])
-    }
-}
-
-function findBreweriesInCity(city){
-    var apiKey = "70ec47e3e10b786dfce3d08410c16454";
-    var URL = "https://api.brewerydb.com/v2/locations/";
-    
-    par = {
-        key: apiKey,
-        format: 'json',
-        locality: city,
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyBEvfvRzimElWF-3XO47hYG4yzqa7Jvd_s",
+        authDomain: "aaron-project-c8c21.firebaseapp.com",
+        databaseURL: "https://aaron-project-c8c21.firebaseio.com",
+        projectId: "aaron-project-c8c21",
+        storageBucket: "aaron-project-c8c21.appspot.com",
+        messagingSenderId: "272640189163"
     };
 
-    $.ajax({
-        url: URL,
-        method: "GET",
-        data: $.param(par)
-    }).done(function(response) {
-        for(i in response.data){
-            var brewery = response.data[i]
-            console.log(brewery)
-            console.log(brewery.id)
-            var db_obj = database.ref().child(brewery.id)
-            db_obj.update(brewery)
+    firebase.initializeApp(config);
+
+    var database = firebase.database()
+
+    database.ref().on("value", function(snapshot) {
+
+        var breweries = [];
+        var data = snapshot.val();
+
+        for(i = 0; i < data.length; i++) {
+            breweries.push(data[i]);
         }
-    });
-}
 
-function upvote_brewery(breweryId){
-    var voted = localStorage.getItem('voted');
-    if(!voted){
-        localStorage.setItem('voted', true)
-        var databaseRef = database.ref(breweryId).child('votes')
-        console.log(databaseRef)
-        databaseRef.transaction(function(votes) {
-            if (votes) {
-                votes = votes + 1;
-            } else {
-                votes = 1
+        var sorted = breweries.sort(function(a, b){
+            return a.votes - b.votes
+        })
+
+        for(i = 0; i < sorted.length; i++) {
+            buildBreweryButton(sorted[i]);
+        }
+    })
+
+
+    // used in conjunction with the function directly below
+    function scanCities() {
+        // vote only on breweries located in these cities
+        var cities = ['Tempe', 'Scottsdale', 'Phoenix', 'Mesa'];
+
+        for(i =0; i < cities.length; i++) {
+
+            findBreweriesInCity(cities[i]);
+        }
+    }
+
+    scanCities();
+
+    function findBreweriesInCity(city) {
+
+        var apiKey = "70ec47e3e10b786dfce3d08410c16454";
+        var URL = "https://api.brewerydb.com/v2/locations/";
+        
+        par = {
+            key: apiKey,
+            format: 'json',
+            locality: city,
+        };
+
+        $.ajax({
+            url: URL,
+            method: "GET",
+            data: $.param(par)
+        }).done(function(response) {
+
+            console.log("=====================================");
+            console.log(response);
+            console.log("=====================================")
+
+
+            var results = response.data;
+
+            for(i = 0; i < results.length; i++) {
+
+                var brewery = results[i];
+
+                console.log(brewery);
+                console.log(brewery.id);
+                
+                var db_obj = database.ref().child(brewery.id);
+                db_obj.update(brewery);
             }
-
-            return votes;
         });
     }
-}
 
-function build_brewery_button(breweryResults){
-    console.log(breweryResults.brewery.name)
-    //store object data (name,logo,location,price, website, phone, beeers, tweets?)
-    // anchor for dropdown portion
-    var anchor = $("<a>").attr({"data-toggle": "collapse",
-         "href": "#collapseOne",
-         "aria-expanded": "true",
-         "aria-controls": "collapseOne"});
+    // function upvoteBrewery(breweryId){
+    //     // Prevent a user from voting multiple times
+    //     var voted = sessionStorage.getItem('voted');
+    //     if(!voted){
+    //         sessionStorage.setItem('voted', true)
+    //         var databaseRef = database.ref(breweryId).child('votes')
+    //         databaseRef.transaction(function(votes) {
+    //             if (votes) {
+    //                 votes = votes + 1;
+    //             } else {
+    //                 votes = 1
+    //             }
+    //             return votes;
+    //         });
+    //     } else {
+    //         console.log('already voted')
+    //     }
+    // }
 
-    //main div for brewery button
-    var mainDiv = $("<div>").addClass("row row-button align-items-center mx-auto my-2");
+    function buildBreweryButton(breweryResults) {
+        // anchor for dropdown portion
+        var anchor = $("<a>");
+        anchor.attr("data-toggle", "dropdown");
+        anchor.attr("href", "collapseOne");
+        anchor.attr("aria-expanded", "true");
+        anchor.attr("aria-controls", "collapseOne");
+        //main div for brewery button
+        var mainDiv = $("<div>").addClass("row row-button align-items-center mx-auto my-2");
+        // store names of breweries in variable
+        var name = breweryResults.brewery.name;
+        // create brewery div and display the brewery name inside it
+        var nameDiv = $("<div>").addClass("col-md-4 ").html("<p>" + name + "</p>");
+        // add nameDiv inside mainDiv
+        mainDiv.append(nameDiv);
+        // store logo into a variable
+        var logo = breweryResults.brewery.images.medium;
+        // create logoDiv
+        var logoDiv = $("<div>").addClass("col-md-4 ");
+        // create img div
+        var image = $("<img>").addClass("img-thumbnail custom").attr("src", logo);
+        // append image variable to logoDiv
+        logoDiv.append(image);
+        //append logDiv to mainDiv
+        mainDiv.append(logoDiv);
+        // container div for holding city and price
+        var containerDiv = $("<div>").addClass("col-md-4");
+        // create div to store established date
+        var localityDiv = $("<div class='col-md-6 align-self-center'>");
+        // store location (city) into a variable
+        var locality = breweryResults.locality;
+        // display city in html
+        localityDiv.html("<h6> Located in: " + locality + "</h6>");
+        // create div for time of establishment 
+        var dateDiv = $("<div class='col-md-6 align-self-center'>");
+        // store year of establishment in variable
+        var date = breweryResults.brewery.established;
+        // display date in html
+        dateDiv.html("<h6> Established: " + date + "</h6>");
+        //Appends the city and date of establishment to the container div
+        containerDiv.append(localityDiv);
+        containerDiv.append(dateDiv);
+        // add containerDiv to mainDiv 
+        mainDiv.append(containerDiv);
+        //appending everything in the brewery button together
+        anchor.append(mainDiv);
+        // display button in html
+        $("#brewery-buttons").append(anchor);
 
-    //div for ranking position
-    // var rankDiv = $("<div>").addClass("col-md-1 ").append($("<h2>" + i + "</h2>"));
+        // dropdown elements
+        var dropdownDiv = $("<div>");
+        dropdownDiv.addClass("collapse hide");
+        dropdownDiv.attr("id", "collapseOne");
+        dropdownDiv.attr("role", "tabpanel");
+        dropdownDiv.attr("aria-labelledby", "headingOne");
+        dropdownDiv.attr("data-parent", "#accordion");
+        //Div that will hold left and right side information
+        var infoDiv = $("<div>").addClass("row widthContainer mx-auto");
+        //left side div
+        var leftSideDiv = $("<div>").addClass("col");
+        // store description in variable
+        var description = breweryResults.brewery.description;
+        // display descripition in html, under the h4 heading
+        var headingDescription = $("<h4> Description: </h4>");
+        var pDescription = $("<p>" + description + "</p>");
+        // add the heading and paragraph to the leftSideDiv
+        leftSideDiv.append(headingDescription);
+        leftSideDiv.append(pDescription);    
+        //  append left side div to infoDiv
+        infoDiv.append(leftSideDiv);
+        // right side div
+        var rightSideDiv = $("<div>").addClass("col");
+        // store website address into a variable
+        var website = breweryResults.brewery.website;
+        //anchor element to hold website
+        var dropdownAnchor = $("<a>").attr("href", website);
+        dropdownAnchor.attr("target", "_blank");
+        dropdownAnchor.html("<h4>'Website: " + website + "</h4>");
+        rightSideDiv.append(dropdownAnchor);
 
-    //div for brewery name
-    var nameDiv = $("<div>").addClass("col-md-4 ").append($("<h1>" + breweryResults.name + "</h1>"));
+        infoDiv.append(rightSideDiv);
 
-    //div for logo
-    var logoDiv = $("<div>").addClass("col-md-4 ").append($("<img src=" + breweryResults.images.icon + " class='img-thumbnail custom'>"));
+        dropdownDiv.append(infoDiv);
 
-    //container div for holding city and price
-    var containerDiv = $("<div>").addClass("col-md-3");
-    var cityDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.city + "</h6>"));
-    var dateDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.createDate + "</h6>"));
+        anchor.append(dropdownDiv);
 
-    //Appends the city and price to the container div
-    containerDiv.append(cityDiv);
-    containerDiv.append(dateDiv);
+    }
 
-    //appending everything in the brewery button together
-    anchor.append(mainDiv);
-
-    // anchor.append(rankDiv);
-    anchor.append(nameDiv);
-    anchor.append(logoDiv);
-    anchor.append(containerDiv);
-
-    //Dropdown portion for when the brewery button is clicked
-    var dropdownDiv = $("<div>").attr({id: "collapseOne",
-         class: "collapse hide",
-         role: "tabpanel",
-         "aria-labelledby": "headingOne",
-         "data-parent": "#accordion"});
-
-    //Div that will hold left and right side information
-    var infoDiv = $("<div>").addClass("row widthContainer mx-auto");
-
-    //left side div
-    var leftSideDiv = $("<div>").addClass("col");
-    var headingDescription = $("<h4> Description: </h4>");
-    var pDescription = $("<p>");
-    leftSideDiv.append(headingDescription);
-    leftSideDiv.append(pDescription);
-
-    //  append left side div to infodiv
-    infoDiv.append(leftSideDiv);
-
-    // right side div
-    var rightSideDiv = $("<div>").addClass("col");
-
-    //anchor element to hold website
-    var dropdownAnchor = $("<a>").attr('href', breweryResults.website);
-    dropdownAnchor.attr("target", "_blank");
-    dropdownAnchor.append($("<h4>'Website: " + breweryResults.website + "</h4>"));
-    rightSideDiv.append(dropdownAnchor);
-    infoDiv.append(rightSideDiv);
-
-    //appending everything in the dropdown together
-    dropdownDiv.append(infoDiv);
-
-}
+});
 
