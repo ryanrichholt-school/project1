@@ -1,3 +1,39 @@
+
+
+
+html, body {
+	
+	font-family: 'Special Elite', cursive;
+
+}
+
+
+.background {
+	background: url('../img/beer-taps.jpg');
+	background-size: cover;
+	background-attachment: fixed;
+	background-position: center bottom;
+	margin-top:-30px;
+	
+}
+
+
+.h1, h1 {
+	font-family: 'Allerta Stencil', sans-serif;
+    font-size: 5.0em;
+    padding-top: 20px;
+    color: white;
+    background-color: black;
+	padding:10px 50px;
+	opacity: .9;
+}
+}
+span{
+	background-color: black;
+	padding:10px 50px;
+	opacity: .9;
+}
+
 a {
 	color:inherit;
 	text-decoration: none;
@@ -19,14 +55,22 @@ a:hover
 	border: solid 3px black;
 	border-radius: 10px;
 	width: 80%;
+	background-color: black;
+	color: white;
+	opacity: .9;
 
 }
 
 .row-button:hover {
 	cursor: pointer;
+	background-color: darkgrey;
 }
 
 .widthContainer {
 	width: 80%;
+	background-color: white;
+	opacity: .8;
+	border: 2px solid black;
+	border-radius: 15px;
 }
 
