@@ -100,27 +100,29 @@ function build_brewery_button(breweryResults){
     // var rankDiv = $("<div>").addClass("col-md-1 ").append($("<h2>" + i + "</h2>"));
 
     //div for brewery name
-    var nameDiv = $("<div>").addClass("col-md-4 ").append($("<h1>" + breweryResults.name + "</h1>"));
+    var nameDiv = $("<div>").addClass("col-md-4 text-center").append($("<h4>" + breweryResults.brewery.name + "</h4>"));
 
     //div for logo
-    var logoDiv = $("<div>").addClass("col-md-4 ").append($("<img src=" + breweryResults.images.icon + " class='img-thumbnail custom'>"));
+    var logoDiv = $("<div>").addClass("col-md-4 ").append($("<img src=" + breweryResults.brewery.images.medium + " class='img-thumbnail custom'>"));
 
     //container div for holding city and price
     var containerDiv = $("<div>").addClass("col-md-3");
-    var cityDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.city + "</h6>"));
-    var dateDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.createDate + "</h6>"));
-
+    var cityDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.locality + "</h6>"));
+    var dateDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.brewery.established + "</h6>"));
+    
     //Appends the city and price to the container div
-    containerDiv.append(cityDiv);
+  	containerDiv.append(cityDiv);
     containerDiv.append(dateDiv);
 
     //appending everything in the brewery button together
+    mainDiv.append(nameDiv);
+    mainDiv.append(logoDiv);
+    mainDiv.append(containerDiv);
+
+    //append everything to anchor
     anchor.append(mainDiv);
 
-    // anchor.append(rankDiv);
-    anchor.append(nameDiv);
-    anchor.append(logoDiv);
-    anchor.append(containerDiv);
+    $("#buttons-div").append(anchor);
 
     //Dropdown portion for when the brewery button is clicked
     var dropdownDiv = $("<div>").attr({id: "collapseOne",
@@ -146,14 +148,16 @@ function build_brewery_button(breweryResults){
     var rightSideDiv = $("<div>").addClass("col");
 
     //anchor element to hold website
-    var dropdownAnchor = $("<a>").attr('href', breweryResults.website);
+    var dropdownAnchor = $("<a>").attr('href', breweryResults.brewery.website);
     dropdownAnchor.attr("target", "_blank");
-    dropdownAnchor.append($("<h4>'Website: " + breweryResults.website + "</h4>"));
+    dropdownAnchor.append($("<h4>Website: " + breweryResults.brewery.website + "</h4>"));
     rightSideDiv.append(dropdownAnchor);
     infoDiv.append(rightSideDiv);
 
     //appending everything in the dropdown together
     dropdownDiv.append(infoDiv);
+    $("#buttons-div").append(dropdownDiv);
+    
 
 }
 
