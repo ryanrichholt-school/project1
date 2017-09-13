@@ -16,6 +16,8 @@ var database = firebase.database()
 
 
 database.ref().on("value", function(snapshot){
+	 $("#buttons-div").empty();
+
     var breweries = []
     var data = snapshot.val()
     for(i in data){
@@ -24,8 +26,9 @@ database.ref().on("value", function(snapshot){
 
     var sorted = breweries.sort(function(a, b){
         return a.votes - b.votes
-    })
 
+    })
+console.log(sorted);
     for(i in sorted){
         build_brewery_button(sorted[i])
     }
@@ -89,7 +92,7 @@ function build_brewery_button(breweryResults){
     //store object data (name,logo,location,price, website, phone, beeers, tweets?)
     // anchor for dropdown portion
     var anchor = $("<a>").attr({"data-toggle": "collapse",
-         "href": "#collapseOne",
+         "href": "#" + breweryResults.breweryId,
          "aria-expanded": "true",
          "aria-controls": "collapseOne"});
 
@@ -125,7 +128,7 @@ function build_brewery_button(breweryResults){
     $("#buttons-div").append(anchor);
 
     //Dropdown portion for when the brewery button is clicked
-    var dropdownDiv = $("<div>").attr({id: "collapseOne",
+    var dropdownDiv = $("<div>").attr({"id": breweryResults.breweryId,
          class: "collapse hide",
          role: "tabpanel",
          "aria-labelledby": "headingOne",
@@ -137,7 +140,7 @@ function build_brewery_button(breweryResults){
     //left side div
     var leftSideDiv = $("<div>").addClass("col");
     var headingDescription = $("<h4> Description: </h4>");
-    var pDescription = $("<p>");
+    var pDescription = $("<p>" + breweryResults.brewery.description + "</p>");
     leftSideDiv.append(headingDescription);
     leftSideDiv.append(pDescription);
 
