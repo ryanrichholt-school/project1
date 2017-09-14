@@ -20,16 +20,20 @@ database.ref().on("value", function(snapshot){
 
     var breweries = []
     var data = snapshot.val()
+
     for(i in data){
         breweries.push(data[i])
     }
 
     var sorted = breweries.sort(function(a, b){
-        return a.votes - b.votes
-
+        var avotes = parseInt(a.votes) || 0
+        var bvotes = parseInt(b.votes) || 0
+        return bvotes - avotes
     })
-console.log(sorted);
+
     for(i in sorted){
+        console.log(sorted[i].id)
+        console.log(sorted[i])
         build_brewery_button(sorted[i])
     }
 })
@@ -59,22 +63,24 @@ function findBreweriesInCity(city){
         data: $.param(par)
     }).done(function(response) {
         for(i in response.data){
+            // For every object in the brewery array
             var brewery = response.data[i]
-            console.log(brewery)
-            console.log(brewery.id)
+            // Create a database reference to db/brewery.id
             var db_obj = database.ref().child(brewery.id)
+            // Update database reference with brewery object
             db_obj.update(brewery)
         }
     });
 }
 
-function upvote_brewery(breweryId){
+function upvote_brewery(id){
     // Prevent a user from voting multiple times
     var voted = sessionStorage.getItem('voted');
     if(!voted){
         sessionStorage.setItem('voted', true)
-        var databaseRef = database.ref(breweryId).child('votes')
-        databaseRef.transaction(function(votes) {
+        var databaseRef = database.ref(id).child('votes')
+        databaseRef.transaction(function(current_votes) {
+            var votes = parseInt(current_votes) || 0
             if (votes) {
                 votes = votes + 1;
             } else {
@@ -87,12 +93,14 @@ function upvote_brewery(breweryId){
     }
 }
 
+
 function build_brewery_button(breweryResults){
+    console.log('building: ', breweryResults)
     console.log(breweryResults.brewery.name)
     //store object data (name,logo,location,price, website, phone, beeers, tweets?)
     // anchor for dropdown portion
     var anchor = $("<a>").attr({"data-toggle": "collapse",
-         "href": "#" + breweryResults.breweryId,
+         "href": "#" + breweryResults.id,
          "aria-expanded": "true",
          "aria-controls": "collapseOne"});
 
@@ -111,7 +119,7 @@ function build_brewery_button(breweryResults){
     //container div for holding city and price
     var containerDiv = $("<div>").addClass("col-md-3");
     var cityDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.locality + "</h6>"));
-    var dateDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.brewery.established + "</h6>"));
+    var dateDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.brewery.established + 'votes:'+ breweryResults.votes + "</h6>"));
     
     //Appends the city and price to the container div
   	containerDiv.append(cityDiv);
@@ -128,7 +136,7 @@ function build_brewery_button(breweryResults){
     $("#buttons-div").append(anchor);
 
     //Dropdown portion for when the brewery button is clicked
-    var dropdownDiv = $("<div>").attr({"id": breweryResults.breweryId,
+    var dropdownDiv = $("<div>").attr({"id": breweryResults.id,
          class: "collapse hide",
          role: "tabpanel",
          "aria-labelledby": "headingOne",
