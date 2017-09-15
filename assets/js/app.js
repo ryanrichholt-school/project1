@@ -75,22 +75,16 @@ function findBreweriesInCity(city){
 
 function upvote_brewery(id){
     // Prevent a user from voting multiple times
-    var voted = sessionStorage.getItem('voted');
-    if(!voted){
-        sessionStorage.setItem('voted', true)
-        var databaseRef = database.ref(id).child('votes')
-        databaseRef.transaction(function(current_votes) {
-            var votes = parseInt(current_votes) || 0
-            if (votes) {
-                votes = votes + 1;
-            } else {
-                votes = 1
-            }
-            return votes;
-        });
-    } else {
-        console.log('already voted')
-    }
+    var databaseRef = database.ref(id).child('votes')
+    databaseRef.transaction(function(current_votes) {
+        var votes = parseInt(current_votes) || 0
+        if (votes) {
+            votes = votes + 1;
+        } else {
+            votes = 1
+        }
+        return votes;
+    });
 }
 
 
@@ -111,7 +105,7 @@ function build_brewery_button(breweryResults){
     // var rankDiv = $("<div>").addClass("col-md-1 ").append($("<h2>" + i + "</h2>"));
 
     //div for brewery name
-    var nameDiv = $("<div>").addClass("col-md-4 text-center").append($("<h4>" + breweryResults.brewery.name + "</h4>"));
+    var nameDiv = $("<div>").addClass("col-md-3 text-center pt-2").append($("<h4>" + breweryResults.brewery.name + "</h4>"));
 
     //div for logo
     var logoDiv = $("<div>").addClass("col-md-4 ").append($("<img src=" + breweryResults.brewery.images.medium + " class='img-thumbnail custom'>"));
@@ -119,8 +113,25 @@ function build_brewery_button(breweryResults){
     //container div for holding city and price
     var containerDiv = $("<div>").addClass("col-md-3");
     var cityDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.locality + "</h6>"));
-    var dateDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.brewery.established + 'votes:'+ breweryResults.votes + "</h6>"));
-    
+
+    var dateDiv = $("<div>").addClass("col-md-3 align-self-center ").append($("<h6>" + breweryResults.brewery.established + "</h6>"));
+    var buttonButton = $("<button>").attr({id:"upVote",
+    		 type:"button",
+    		 "data-type": breweryResults.id,
+    		  class:"btn btn-outline-secondary"
+    }).append($("<i>").attr({class:"fa fa-thumbs-o-up fa-2x", 
+    	"aria-hidden":"true"
+    }));
+
+    buttonButton.on('click', function(event){
+        event.stopPropagation()
+        console.log('upvote clicked... ' + $(this).attr('data-type'))
+        upvote_brewery($(this).attr('data-type'))
+        $(this).remove()
+    })
+
+    var buttonDiv= $("<div>").addClass("col-md-2 align-self-center").append(buttonButton);
+
     //Appends the city and price to the container div
   	containerDiv.append(cityDiv);
     containerDiv.append(dateDiv);
@@ -129,6 +140,7 @@ function build_brewery_button(breweryResults){
     mainDiv.append(nameDiv);
     mainDiv.append(logoDiv);
     mainDiv.append(containerDiv);
+    mainDiv.append(buttonDiv);
 
     //append everything to anchor
     anchor.append(mainDiv);
@@ -146,7 +158,7 @@ function build_brewery_button(breweryResults){
     var infoDiv = $("<div>").addClass("row widthContainer mx-auto");
 
     //left side div
-    var leftSideDiv = $("<div>").addClass("col");
+    var leftSideDiv = $("<div>").addClass("col pt-3");
     var headingDescription = $("<h4> Description: </h4>");
     var pDescription = $("<p>" + breweryResults.brewery.description + "</p>");
     leftSideDiv.append(headingDescription);
@@ -156,7 +168,7 @@ function build_brewery_button(breweryResults){
     infoDiv.append(leftSideDiv);
 
     // right side div
-    var rightSideDiv = $("<div>").addClass("col");
+    var rightSideDiv = $("<div>").addClass("col pt-3");
 
     //anchor element to hold website
     var dropdownAnchor = $("<a>").attr('href', breweryResults.brewery.website);
